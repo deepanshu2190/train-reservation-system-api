@@ -8,4 +8,32 @@ title: Sample API
         body:
           application/json: 
             example: {"":""}
-              
+  post:
+    body:
+      application/json:
+        example: { "":"" }
+    responses:
+      '200':
+        body:
+          application/json:
+            example:
+              {"Status": "Added"}  
+  put:
+      responses: 
+        '200':
+          description: Get specific customer details
+          body: 
+            application/json: 
+              example:
+                custName: "Deepanshu Deshmukh"
+                custId: "112"
+              type: object
+  delete:
+      body: 
+        application/json: 
+          example: { "":"" }
+      responses: 
+        '200':
+          body: 
+            application/json: 
+              example: {"Status": "Deleted"}                                      
