@@ -7,11 +7,11 @@ title: Sample API
         description: All Customers
         body:
           application/json: 
-            example: {"":""}
+            example: { "trainno": "", "TrainName": "", "TravelDays": "", "From": "", "Destination": "", "Time": "" }
   post:
     body:
       application/json:
-        example: { "":"" }
+        example: { "trainno": "", "TrainName": "", "TravelDays": "", "From": "", "Destination": "", "Time": "" }
     responses:
       '200':
         body:
@@ -19,15 +19,15 @@ title: Sample API
             example:
               {"Status": "Added"}  
   put:
+      body: 
+        application/json: 
+          example: { "trainno": "", "TrainName": "", "TravelDays": "", "From": "", "Destination": "", "Time": "" }
       responses: 
         '200':
-          description: Get specific customer details
+          description: Update Train Details
           body: 
             application/json: 
-              example:
-                custName: "Deepanshu Deshmukh"
-                custId: "112"
-              type: object
+              example: {"Status": "Updated"}
   delete:
       body: 
         application/json: 
