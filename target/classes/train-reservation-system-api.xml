@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <http:listener-config name="train-reservation-system-api-httpListenerConfig" host="localhost" port="8020" doc:name="HTTP Listener Configuration"/>
+    <apikit:config name="train-reservation-system-api-config" raml="train-reservation-system-api.raml" consoleEnabled="false" doc:name="Router"/>
+    <db:mysql-config name="MySQL_Configuration" host="localhost" port="3306" user="root" password="1234" database="reservation" doc:name="MySQL Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="8040" doc:name="HTTP Listener Configuration"/>
+    <flow name="train-reservation-system-api-main">
+        <http:listener config-ref="train-reservation-system-api-httpListenerConfig" path="/api/*" doc:name="HTTP"/>
+        <apikit:router config-ref="train-reservation-system-api-config" doc:name="APIkit Router"/>
+        <exception-strategy ref="train-reservation-system-api-apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy"/>
+    </flow>
+    <flow name="train-reservation-system-api-console">
+        <http:listener config-ref="train-reservation-system-api-httpListenerConfig" path="/console/*" doc:name="HTTP"/>
+        <apikit:console config-ref="train-reservation-system-api-config" doc:name="APIkit Console"/>
+    </flow>
+    <flow name="put:/train:train-reservation-system-api-config">
+        <set-payload value="{&#xA;&quot;Status&quot; : &quot;Updated&quot;&#xA;}" doc:name="Set Payload"/>
+    </flow>
+    <flow name="delete:/train:train-reservation-system-api-config">
+        <set-payload value="{&#xA;&quot;Status&quot; : &quot;Deleted&quot;&#xA;}" doc:name="Set Payload"/>
+    </flow>
+    <flow name="get:/train:train-reservation-system-api-config">
+        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+"Select * from reservation"]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <flow-ref name="train-reservation-system-apiGetSub_Flow" doc:name="train-reservation-system-apiGetSub_Flow"/>
+
+    </flow>
+    <sub-flow name="train-reservation-system-apiGetSub_Flow">
+        <logger message="#[payload]" level="INFO" doc:name="GetLogger"/>
+        <db:select config-ref="MySQL_Configuration" doc:name="SQLDatabase">
+            <db:dynamic-query><![CDATA[#[payload]]]></db:dynamic-query>
+        </db:select>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+    </sub-flow>
+    <flow name="post:/train:train-reservation-system-api-config">
+        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+"insert into customers (trainno, TrainName, TravelDays, From, Destination, Time) values (
+"
+++ "'" ++ payload.trainno ++ "'" ++ ","
+++ "'" ++ payload.TrainName ++ "'" ++ ","
+++ "'" ++ payload.TravelDays ++ "'" ++ ","
+++ "'" ++ payload.From ++ "'" ++ "'" ++ ","
+++ "'" ++ payload.Destination ++ "'" ++ ","
+++ "'" ++ payload.Time ++ "'" ++ ")"]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <flow-ref name="train-reservation-system-apiPostSub_Flow" doc:name="train-reservation-system-apiPostSub_Flow"/>
+
+    </flow>
+    <sub-flow name="train-reservation-system-apiPostSub_Flow">
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <db:insert config-ref="MySQL_Configuration" doc:name="Database">
+            <db:dynamic-query><![CDATA[#[payload]]]></db:dynamic-query>
+        </db:insert>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+    </sub-flow>
+    <apikit:mapping-exception-strategy name="train-reservation-system-api-apiKitGlobalExceptionMapping">
+        <apikit:mapping statusCode="404">
+            <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="405">
+            <apikit:exception value="org.mule.module.apikit.exception.MethodNotAllowedException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="415">
+            <apikit:exception value="org.mule.module.apikit.exception.UnsupportedMediaTypeException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="406">
+            <apikit:exception value="org.mule.module.apikit.exception.NotAcceptableException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="400">
+            <apikit:exception value="org.mule.module.apikit.exception.BadRequestException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+    </apikit:mapping-exception-strategy>
+</mule>
