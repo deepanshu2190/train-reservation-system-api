@@ -46,7 +46,6 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
     <flow name="post:/train:train-reservation-system-api-config">
         <byte-array-to-string-transformer doc:name="Byte Array to String"/>
         <dw:transform-message doc:name="Transform Message">
-        <dw:input-payload  mimeType="application/xml"/>
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
 ---
