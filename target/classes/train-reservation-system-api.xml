@@ -46,17 +46,18 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
     <flow name="post:/train:train-reservation-system-api-config">
         <byte-array-to-string-transformer doc:name="Byte Array to String"/>
         <dw:transform-message doc:name="Transform Message">
+        <dw:input-payload  mimeType="application/xml"/>
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
 ---
-"insert into customers (trainno, TrainName, TravelDays, From, Destination, Time) values (
+"insert into train (trainno, trainname, traveldays, origin, destination, depart) values (
 "
 ++ "'" ++ payload.trainno ++ "'" ++ ","
-++ "'" ++ payload.TrainName ++ "'" ++ ","
-++ "'" ++ payload.TravelDays ++ "'" ++ ","
-++ "'" ++ payload.From ++ "'" ++ "'" ++ ","
-++ "'" ++ payload.Destination ++ "'" ++ ","
-++ "'" ++ payload.Time ++ "'" ++ ")"]]></dw:set-payload>
+++ "'" ++ payload.trainname ++ "'" ++ ","
+++ "'" ++ payload.traveldays ++ "'" ++ ","
+++ "'" ++ payload.origin ++ "'" ++ ","
+++ "'" ++ payload.destination ++ "'" ++ ","
+++ "'" ++ payload.depart ++ "'" ++ ")"]]></dw:set-payload>
         </dw:transform-message>
         <logger message="#[payload]" level="INFO" doc:name="Logger"/>
         <flow-ref name="train-reservation-system-apiPostSub_Flow" doc:name="train-reservation-system-apiPostSub_Flow"/>
