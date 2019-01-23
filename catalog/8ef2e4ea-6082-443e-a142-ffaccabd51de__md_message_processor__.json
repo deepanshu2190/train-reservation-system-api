@@ -1,0 +1,11 @@
+{
+    "inputMessageMetadata": {
+        "messagePayload": {
+            "connectorName": "MySQL_Configuration",
+            "typeId": "java.lang.Integer"
+        }
+    },
+    "outputMessageMetadata": {},
+    "id": "8ef2e4ea-6082-443e-a142-ffaccabd51de",
+    "version": "5.2.0.0"
+}
