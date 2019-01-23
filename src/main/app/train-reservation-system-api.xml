@@ -96,8 +96,24 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
         <logger message="#[payload]" level="INFO" doc:name="Logger"/>
     </sub-flow>
     <flow name="get:/train/{trainno}:train-reservation-system-api-config">
-        <set-payload value="{&#xA;&quot;trainno&quot; : &quot;&quot;,&#xA;&quot;TrainName&quot; : &quot;&quot;,&#xA;&quot;TravelDays&quot; : &quot;&quot;,&#xA;&quot;Origin&quot; : &quot;&quot;,&#xA;&quot;Destination&quot; : &quot;&quot;,&#xA;&quot;Depart&quot; : &quot;&quot;&#xA;}" doc:name="Set Payload"/>
+        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+"select * from train where trainno='" ++ inboundProperties.'http.uri.params'.trainno ++ "'"]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <flow-ref name="Selecttrain-reservation-system-apiSub_Flow" doc:name="Selecttrain-reservation-system-apiSub_Flow"/>
+
     </flow>
+    <sub-flow name="Selecttrain-reservation-system-apiSub_Flow">
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <db:select config-ref="MySQL_Configuration" doc:name="Database">
+            <db:dynamic-query><![CDATA[#[payload]]]></db:dynamic-query>
+        </db:select>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+    </sub-flow>
     <flow name="post:/train/{trainno}:train-reservation-system-api-config">
         <set-payload value="{&#xA;&quot;Status&quot; : &quot;Added&quot;&#xA;}" doc:name="Set Payload"/>
     </flow>
