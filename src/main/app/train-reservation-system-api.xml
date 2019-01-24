@@ -68,8 +68,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
 ---
-"UPDATE SET name = '" ++ inboundProperties.'http.uri.params'.trainname ++ "'
-'" ++ inboundProperties.'http.query.params'.traveldays ++ "'
+"UPDATE train SET trainname = '" ++ inboundProperties.'http.uri.params'.trainname ++ "'
 where trainno = '" ++ payload.trainno ++ "'"]]></dw:set-payload>
         </dw:transform-message>
         <logger message="#[payload]" level="INFO" doc:name="Logger"/>
