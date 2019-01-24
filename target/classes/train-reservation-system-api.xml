@@ -40,90 +40,113 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
     <flow name="post:/train:train-reservation-system-api-config">
         <byte-array-to-string-transformer doc:name="Byte Array to String" />
         <dw:transform-message doc:name="Transform Message">
+            <dw:input-payload doc:sample="sample_data\json.json" />
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
 ---
-"insert into train (trainno, trainname, traveldays, origin, destination, depart) values (
-"
-++ "'" ++ payload.trainno ++ "'" ++ ","
-++ "'" ++ payload.trainname ++ "'" ++ ","
-++ "'" ++ payload.traveldays ++ "'" ++ ","
-++ "'" ++ payload.origin ++ "'" ++ ","
-++ "'" ++ payload.destination ++ "'" ++ ","
-++ "'" ++ payload.depart ++ "'" ++ ")"]]></dw:set-payload>
+"insert into train (trainno, trainname, traveldays, origin, destination, depart) values ("
+++ "'" ++ payload.trainno ++ "'," 
+++ "'" ++ payload.TrainName ++ "'" ++ ","
+++ "'" ++ payload.TravelDays ++ "'" ++ ","
+++ "'" ++ payload.Origin ++ "'" ++ ","
+++ "'" ++ payload.Destination ++ "'" ++ ","
+++ "'" ++ payload.Depart ++ "'" ++ ")"]]></dw:set-payload>
         </dw:transform-message>
         <logger message="#[payload]" level="INFO" doc:name="Logger" />
-        <flow-ref name="Inserttrain-reservation-system-apiSub_Flow" doc:name="Flow Reference" />
+        <flow-ref name="Inserttrain-reservation-system-apiSub_Flow" doc:name="Inserttrain-reservation-system-apiSub_Flow" />
     </flow>
     <sub-flow name="Inserttrain-reservation-system-apiSub_Flow">
-        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
         <db:insert config-ref="MySQL_Configuration" doc:name="Database">
             <db:dynamic-query><![CDATA[#[payload]]]></db:dynamic-query>
         </db:insert>
-        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
     </sub-flow>
     <flow name="put:/train/{trainno}:train-reservation-system-api-config">
-        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <byte-array-to-string-transformer doc:name="Byte Array to String" />
         <dw:transform-message doc:name="Transform Message">
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
 ---
-{
-}]]></dw:set-payload>
+"UPDATE train SET trainname = '" ++ inboundProperties.'http.uri.params'.trainname ++ "'
+where trainno = '" ++ payload.trainno ++ "'"]]></dw:set-payload>
         </dw:transform-message>
-        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
-        <flow-ref name="UpdateNotrain-reservation-system-apiSub_Flow" doc:name="UpdateNotrain-reservation-system-apiSub_Flow"/>
-
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
+        <flow-ref name="UpdateNotrain-reservation-system-apiSub_Flow" doc:name="UpdateNotrain-reservation-system-apiSub_Flow" />
     </flow>
     <sub-flow name="UpdateNotrain-reservation-system-apiSub_Flow">
-        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
         <db:update config-ref="MySQL_Configuration" doc:name="Database">
             <db:dynamic-query><![CDATA[#[payload]]]></db:dynamic-query>
         </db:update>
-        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
     </sub-flow>
     <flow name="delete:/train/{trainno}:train-reservation-system-api-config">
-        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <byte-array-to-string-transformer doc:name="Byte Array to String" />
         <dw:transform-message doc:name="Transform Message">
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
 ---
 "delete from train where trainno='" ++ inboundProperties.'http.uri.params'.trainno ++ "'"]]></dw:set-payload>
         </dw:transform-message>
-        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
-        <flow-ref name="Deletetrain-reservation-system-apiSub_Flow" doc:name="Flow Reference"/>
-
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
+        <flow-ref name="Deletetrain-reservation-system-apiSub_Flow" doc:name="Flow Reference" />
     </flow>
     <sub-flow name="Deletetrain-reservation-system-apiSub_Flow">
-        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
         <db:delete config-ref="MySQL_Configuration" doc:name="Database">
             <db:dynamic-query><![CDATA[#[payload]]]></db:dynamic-query>
         </db:delete>
-        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
     </sub-flow>
     <flow name="get:/train/{trainno}:train-reservation-system-api-config">
-        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <byte-array-to-string-transformer doc:name="Byte Array to String" />
         <dw:transform-message doc:name="Transform Message">
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
 ---
 "select * from train where trainno='" ++ inboundProperties.'http.uri.params'.trainno ++ "'"]]></dw:set-payload>
         </dw:transform-message>
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
+        <flow-ref name="Selecttrain-reservation-system-apiSub_Flow" doc:name="Selecttrain-reservation-system-apiSub_Flow" />
+    </flow>
+    <flow name="get:/train/trainList:train-reservation-system-api-config">
+        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <set-variable variableName="origin" value="#[message.inboundProperties.'http.query.params'.origin]" doc:name="setOrigin"/>
+        <set-variable variableName="destination" value="#[message.inboundProperties.'http.query.params'.destination]" doc:name="setDestination"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+"select * from train where origin='" ++ flowVars.origin ++ "'
+  and destination='" ++ flowVars.destination ++ "'" ]]></dw:set-payload>
+        </dw:transform-message>
         <logger message="#[payload]" level="INFO" doc:name="Logger"/>
-        <flow-ref name="Selecttrain-reservation-system-apiSub_Flow" doc:name="Selecttrain-reservation-system-apiSub_Flow"/>
+        <flow-ref name="trainListtrain-reservation-system-apiSub_Flow" doc:name="trainListtrain-reservation-system-apiSub_Flow"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{"trains": payload
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
 
     </flow>
-    <sub-flow name="Selecttrain-reservation-system-apiSub_Flow">
+    <sub-flow name="trainListtrain-reservation-system-apiSub_Flow">
         <logger message="#[payload]" level="INFO" doc:name="Logger"/>
         <db:select config-ref="MySQL_Configuration" doc:name="Database">
             <db:dynamic-query><![CDATA[#[payload]]]></db:dynamic-query>
         </db:select>
         <logger message="#[payload]" level="INFO" doc:name="Logger"/>
     </sub-flow>
-    <flow name="post:/train/{trainno}:train-reservation-system-api-config">
-        <set-payload value="{&#xA;&quot;Status&quot; : &quot;Added&quot;&#xA;}" doc:name="Set Payload"/>
-    </flow>
-
+    <sub-flow name="Selecttrain-reservation-system-apiSub_Flow">
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
+        <db:select config-ref="MySQL_Configuration" doc:name="Database">
+            <db:dynamic-query><![CDATA[#[payload]]]></db:dynamic-query>
+        </db:select>
+        <logger message="#[payload]" level="INFO" doc:name="Logger" />
+    </sub-flow>
     <apikit:mapping-exception-strategy name="train-reservation-system-api-apiKitGlobalExceptionMapping">
         <apikit:mapping statusCode="404">
             <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />

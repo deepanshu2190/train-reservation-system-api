@@ -27,16 +27,7 @@ title: Sample API
             body:
               application/json: 
                 example: { "trainno": "", "TrainName": "", "TravelDays": "", "Origin": "", "Destination": "", "Depart": "" }
-      post:
-        body:
-          application/json:
-            example: { "trainno": "", "TrainName": "", "TravelDays": "", "Origin": "", "Destination": "", "Depart": "" }
-        responses:
-          '200':
-            body:
-              application/json:
-                example:
-                  {"Status": "Added"}
+      
       put:
         body: 
           application/json: 
@@ -55,4 +46,23 @@ title: Sample API
           '200':
             body: 
               application/json: 
-                example: {"Status": "Deleted"}                                      
+                example: {"Status": "Deleted"}                                            
+
+
+
+
+
+
+
+
+
+  /trainList:
+    get:
+      queryParameters: 
+        origin:
+        destination:
+      responses: 
+        '200':
+      body: 
+        application/json:
+          example: { "trainno": "", "TrainName": "", "TravelDays": "", "Origin": "", "Destination": "", "Depart": "" }
