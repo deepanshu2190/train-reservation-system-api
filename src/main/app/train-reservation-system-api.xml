@@ -175,4 +175,15 @@ where trainno = '" ++ payload.trainno ++ "'"]]></dw:set-payload>
             <set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" doc:name="Set Payload" />
         </apikit:mapping>
     </apikit:mapping-exception-strategy>
+    
+    <configuration doc:name="Configuration">
+	<expression-language>
+		<import class="DateToDay" />
+		<global-functions>
+    def dateToDay(formattedDate) {
+    return DateToDay.dateToDay(formattedDate);
+    }
+   </global-functions>
+	</expression-language>
+</configuration>
 </mule>
