@@ -130,6 +130,7 @@ where trainno = '" ++ payload.trainno ++ "'"]]></dw:set-payload>
 {"trains": payload
 }]]></dw:set-payload>
         </dw:transform-message>
+        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
         <logger message="#[payload]" level="INFO" doc:name="Logger"/>
 
     </flow>
