@@ -6,7 +6,7 @@ import java.util.Date;
 public class DateToDay {
 
 	public static void main(String[] args) {
-		String input_date="24/12/2019";
+		String input_date="27/01/2019";
 		dateToDay(input_date);
 
 
